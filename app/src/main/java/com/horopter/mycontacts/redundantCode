@@ -1,0 +1,17 @@
+//String id = mContactCursor.getString(mContactCursor.getColumnIndex(ContactsContract.Contacts._ID));
+/*if (Integer.parseInt(mContactCursor.getString(mContactCursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+            ArrayList<String> phones = new ArrayList<>();
+            Cursor pCursor = mContext.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                    new String[]{id}, null);
+            while (pCursor.moveToNext()) {
+                phones.add(pCursor.getString(pCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
+            }
+            String listString = "";
+            for (String s : phones)
+            {
+                listString += s + "\n";
+            }
+            currentItem.phone_num.setText(listString);
+            pCursor.close();
+            }*/
