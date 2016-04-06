@@ -1,8 +1,10 @@
 package com.horopter.mycontacts;
 
 import android.app.SearchManager;
+import android.app.SearchableInfo;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.Snackbar;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -23,6 +26,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -34,7 +41,7 @@ import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScrol
 /**
  * Created by Horopter on 3/29/2016.
  */
-public class ContactList extends AppCompatActivity implements View.OnClickListener{
+public class ContactList extends AppCompatActivity implements View.OnClickListener {
     private Context cntx;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -43,17 +50,18 @@ public class ContactList extends AppCompatActivity implements View.OnClickListen
     public MyAdapter mAdapter;
     public ArrayList<Contact> mContacts;
     private Map<String, Integer> mapIndex;
-    private int f,l;
+    private int f, l;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
-        sv= (SearchView) findViewById(R.id.mSearch);
+        sv = (SearchView) findViewById(R.id.mSearch);
         cntx = getApplicationContext();
         String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
         cursor = cntx.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, sortOrder);
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller)findViewById(R.id.fast_scroller);
+        VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) findViewById(R.id.fast_scroller);
         fastScroller.setRecyclerView(mRecyclerView);
         mRecyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
         mLayoutManager = new LinearLayoutManager(this);
@@ -67,11 +75,11 @@ public class ContactList extends AppCompatActivity implements View.OnClickListen
                 String curi = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
                 Integer cid = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID));
                 String clookup = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
-                Contact c = new Contact(contactName,curi,cid,clookup);
+                Contact c = new Contact(contactName, curi, cid, clookup);
                 mContacts.add(c);
             }
         }
-        mAdapter = new MyAdapter(this,mContacts);
+        mAdapter = new MyAdapter(this, mContacts);
         mRecyclerView.setAdapter(mAdapter);
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -95,19 +103,20 @@ public class ContactList extends AppCompatActivity implements View.OnClickListen
         displayIndex();
     }
 
-    private void getIndexList(ArrayList<Contact> fruits){//,int p) {
+    private void getIndexList(ArrayList<Contact> cntacts) { //,int p) {
         mapIndex = new LinkedHashMap<>();
-        mapIndex.put("*",0);
-        if(fruits==null)
-        {
-            Log.d("Crash report","fruits is null");
-            Toast.makeText(getApplicationContext(),"App crashes due to fetch of contacts not possible",Toast.LENGTH_LONG).show();
+        mapIndex.put("*", 0);
+        if (cntacts == null) {
+            Log.d("Crash report", "cntacts is null");
+            Toast.makeText(getApplicationContext(), "App crashes due to fetch of contacts not possible", Toast.LENGTH_LONG).show();
         }
-        for (int i=0;i<fruits.size();i++) {
-            String index = fruits.get(i).getName().substring(0, 1);
-            index = index.toUpperCase();
-            if (mapIndex.get(index) == null)
-                mapIndex.put(index,i);//+Math.abs(p));
+        else {
+            for (int i = 0; i < cntacts.size(); i++) {
+                String index = cntacts.get(i).getName().substring(0, 1);
+                index = index.toUpperCase();
+                if (mapIndex.get(index) == null)
+                    mapIndex.put(index, i);//+Math.abs(p));
+            }
         }
     }
 
